@@ -228,7 +228,7 @@ static const unsigned int TOP_BACKGROUND_HEIGHT          = 35;
 - (UILabel *)dateLabel {
 	if (!_dateLabel) {
 		_dateLabel = [[UILabel alloc] init];
-		_dateLabel.textAlignment = UITextAlignmentCenter;
+		_dateLabel.textAlignment = NSTextAlignmentCenter;
 		_dateLabel.backgroundColor = [UIColor clearColor];
 		_dateLabel.font = [UIFont boldSystemFontOfSize:18];
 		_dateLabel.textColor = [UIColor colorWithRed:59/255. green:73/255. blue:88/255. alpha:1];
@@ -462,8 +462,8 @@ static const CGFloat kCorner       = 5.0;
 	
 	[self.title drawInRect:_textRect
 				  withFont:self.textFont
-			 lineBreakMode:UILineBreakModeTailTruncation
-				 alignment:UITextAlignmentLeft];
+			 lineBreakMode:NSLineBreakByTruncatingTail
+				 alignment:NSTextAlignmentLeft];
 }
 
 - (void)tapDetectingView:(TapDetectingView *)view gotSingleTapAtPoint:(CGPoint)tapPoint {
@@ -709,8 +709,8 @@ static NSString const * const HOURS_24[] = {
 	for (i=0; i < HOURS_IN_DAY; i++) {
 		[HOURS[i] drawInRect: _textRect[i]
 					withFont:self.textFont
-			   lineBreakMode:UILineBreakModeTailTruncation
-				   alignment:UITextAlignmentRight];
+			   lineBreakMode:NSLineBreakByTruncatingTail
+				   alignment:NSTextAlignmentRight];
 		
 		CGContextMoveToPoint(c, _lineX, _lineY[i]);
 		CGContextAddLineToPoint(c, self.bounds.size.width, _lineY[i]);

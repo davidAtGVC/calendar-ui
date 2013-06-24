@@ -287,7 +287,7 @@ static const unsigned int TOP_BACKGROUND_HEIGHT               = 35;
 - (UILabel *)dateLabel {
 	if (!_dateLabel) {
 		_dateLabel = [[UILabel alloc] init];
-		_dateLabel.textAlignment = UITextAlignmentCenter;
+		_dateLabel.textAlignment = NSTextAlignmentCenter;
 		_dateLabel.backgroundColor = [UIColor clearColor];
 		_dateLabel.font = [UIFont boldSystemFontOfSize:18];
 		_dateLabel.textColor = [UIColor colorWithRed:59/255. green:73/255. blue:88/255. alpha:1];
@@ -551,15 +551,15 @@ static NSString const * const HOURS_24[] = {
 	
 	for (i=1; i < HOURS_IN_DAY; i++) {
 		CGSize sizeNecessary = [HOURS[i] sizeWithFont:self.textFont];
-		CGRect rect = CGRectMake(CGRectGetMinX(self.bounds),
+		CGRect newrect = CGRectMake(CGRectGetMinX(self.bounds),
 								 (cellHeight * i) - (sizeNecessary.height / 2.f),
 								 sizeNecessary.width,
 								 sizeNecessary.height);
 		
-		[HOURS[i] drawInRect: rect
+		[HOURS[i] drawInRect: newrect
 					 withFont:self.textFont
-				lineBreakMode:UILineBreakModeTailTruncation
-					alignment:UITextAlignmentLeft]; 
+				lineBreakMode:NSLineBreakByTruncatingTail
+					alignment:NSTextAlignmentLeft];
 	}
 }
 
@@ -637,7 +637,8 @@ static NSString const * const HOURS_24[] = {
 	
 	NSDateComponents *todayComponents = [CURRENT_CALENDAR components:DATE_COMPONENTS fromDate:[NSDate date]];
 	
-	NSArray *weekdaySymbols = [self.dateFormatter veryShortWeekdaySymbols];
+	NSDateFormatter *formatter = [self dateFormatter];
+	NSArray *weekdaySymbols = [formatter veryShortWeekdaySymbols];
 	CFCalendarRef currentCalendar = CFCalendarCopyCurrent();
 	int d = CFCalendarGetFirstWeekday(currentCalendar) - 1;
 	CFRelease(currentCalendar);
@@ -647,7 +648,7 @@ static NSString const * const HOURS_24[] = {
 		NSString *displayText = [NSString stringWithFormat:@"%@ %i", [weekdaySymbols objectAtIndex:d], [components day]];
 		
 		CGSize sizeNecessary = [displayText sizeWithFont:self.textFont];
-		CGRect rect = CGRectMake(cellWidth * i + ((cellWidth - sizeNecessary.width) / 2.f),
+		CGRect newrect = CGRectMake(cellWidth * i + ((cellWidth - sizeNecessary.width) / 2.f),
 								 CGRectGetMinY(self.bounds),
 								 sizeNecessary.width,
 								 sizeNecessary.height);
@@ -662,10 +663,10 @@ static NSString const * const HOURS_24[] = {
 			[self.textColor set];
 		}
 		
-		[displayText drawInRect: rect
+		[displayText drawInRect: newrect
 					withFont:self.textFont
-			   lineBreakMode:UILineBreakModeTailTruncation
-				   alignment:UITextAlignmentLeft];
+			   lineBreakMode:NSLineBreakByTruncatingTail
+				   alignment:NSTextAlignmentLeft];
 		
 		d = (d+1) % 7;
 		i++;
@@ -819,8 +820,8 @@ static const CGFloat kCorner       = 5.0;
 	
 	[self.title drawInRect:_textRect
 				withFont:self.textFont
-				lineBreakMode:UILineBreakModeTailTruncation
-				alignment:UITextAlignmentLeft];
+				lineBreakMode:NSLineBreakByTruncatingTail
+				alignment:NSTextAlignmentLeft];
 }
 
 - (void)tapDetectingView:(TapDetectingView *)view gotSingleTapAtPoint:(CGPoint)tapPoint {
