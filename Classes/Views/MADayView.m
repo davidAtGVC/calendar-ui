@@ -27,9 +27,11 @@
 
 #import "MADayView.h"
 
-#import "MAEvent.h"               /* MAEvent */
-#import <QuartzCore/QuartzCore.h> /* CALayer */
-#import "TapDetectingView.h"      /* TapDetectingView */
+#import "MAEventProtocol.h"
+#import "MAEventSortFunction.h"
+#import "TapDetectingView.h"			/* TapDetectingView */
+
+#import <QuartzCore/QuartzCore.h>	/* CALayer */
 
 static const unsigned int HOURS_IN_DAY                   = 25; // Beginning and end of day is include twice
 static const unsigned int MINUTES_IN_HOUR                = 60;
@@ -54,7 +56,7 @@ static const unsigned int TOP_BACKGROUND_HEIGHT          = 35;
 	UIColor *_textColor;
 	UIFont *_textFont;
 	__unsafe_unretained MADayView *_dayView;
-	MAEvent *_event;
+	id <MAEventProtocol>_event;
 	CGRect _textRect;
 }
 
@@ -64,7 +66,7 @@ static const unsigned int TOP_BACKGROUND_HEIGHT          = 35;
 @property (nonatomic, strong) UIColor *textColor;
 @property (nonatomic, strong) UIFont *textFont;
 @property (nonatomic, unsafe_unretained) MADayView *dayView;
-@property (nonatomic, strong) MAEvent *event;
+@property (nonatomic, strong) id <MAEventProtocol>event;
 
 @end
 
@@ -82,7 +84,7 @@ static const unsigned int TOP_BACKGROUND_HEIGHT          = 35;
 @property (nonatomic,copy) NSDate *day;
 @property (readonly) BOOL hasAllDayEvents;
 
-- (void)addEvent:(MAEvent *)event;
+- (void)addEvent:(id <MAEventProtocol>)event;
 - (void)resetCachedData;
 
 @end
@@ -97,7 +99,7 @@ static const unsigned int TOP_BACKGROUND_HEIGHT          = 35;
 }
 
 - (BOOL)timeIs24HourFormat;
-- (void)addEvent:(MAEvent *)event;
+- (void)addEvent:(id <MAEventProtocol>)event;
 
 @property (nonatomic, unsafe_unretained) MADayView *dayView;
 @property (nonatomic, strong) UIColor *textColor;
@@ -341,19 +343,25 @@ static const unsigned int TOP_BACKGROUND_HEIGHT          = 35;
 	[self.allDayGridView resetCachedData];
 	
 	NSArray *events = [self.dataSource dayView:self eventsForDate:self.day];
+
+	// why is the view updating the model in this situation?
+//	for (id e in events) {
+//		id <MAEventProtocol>event = e;
+//		event.displayDate = self.day;
+//	}
 	
-	for (id e in events) {
-		MAEvent *event = e;
-		event.displayDate = self.day;
-	}
-	
-	for (id e in [events sortedArrayUsingFunction:MAEvent_sortByStartTime context:NULL]) {
-		MAEvent *event = e;
-		event.displayDate = self.day;
+	for (id e in [events sortedArrayUsingFunction:MAEventProtocol_sortByStartTime context:NULL])
+	{
+		id <MAEventProtocol>event = e;
+		// why is the view updating the model in this situation?
+//		event.displayDate = self.day;
 		
-		if (event.allDay) {
+		if ([event isEventAllDay] == YES)
+		{
 			[self.allDayGridView addEvent:event];
-		} else {
+		}
+		else
+		{
 			[self.gridView addEvent:event];
 		}
 	}
@@ -533,15 +541,15 @@ static const CGFloat kCorner       = 5.0;
 	}
 }
 
-- (void)addEvent:(MAEvent *)event {
-	MADayEventView *eventView = [[MADayEventView alloc] initWithFrame: CGRectMake(0, ALL_DAY_VIEW_EMPTY_SPACE + (ALL_DAY_VIEW_EMPTY_SPACE + self.eventHeight) * _eventCount,
-																				  self.bounds.size.width, self.eventHeight)];
+- (void)addEvent:(id <MAEventProtocol>)event
+{
+	MADayEventView *eventView = [[MADayEventView alloc] initWithFrame: CGRectMake(0, ALL_DAY_VIEW_EMPTY_SPACE + (ALL_DAY_VIEW_EMPTY_SPACE + self.eventHeight) * _eventCount, self.bounds.size.width, self.eventHeight)];
 	eventView.dayView = self.dayView;
 	eventView.event = event;
-	eventView.backgroundColor = event.backgroundColor;
-	eventView.title = event.title;
+	eventView.backgroundColor = [event eventBackgroundColor];
+	eventView.title = [event eventTitle];
 	eventView.textFont = self.textFont;
-	eventView.textColor = event.textColor;
+	eventView.textColor = [event eventTextColor];
 	
 	[self addSubview:eventView];
 	
@@ -574,14 +582,14 @@ static NSString const * const HOURS_24[] = {
 	return _lineX;
 }
 
-- (void)addEvent:(MAEvent *)event {
+- (void)addEvent:(id <MAEventProtocol>)event {
 	MADayEventView *eventView = [[MADayEventView alloc] initWithFrame:CGRectZero];
 	eventView.dayView = self.dayView;
 	eventView.event = event;
-	eventView.backgroundColor = event.backgroundColor;
-	eventView.title = event.title;
+	eventView.backgroundColor = [event eventBackgroundColor];
+	eventView.title = [event eventTitle];
 	eventView.textFont = self.dayView.boldFont;
-	eventView.textColor = event.textColor;
+	eventView.textColor = [event eventTextColor];
 	
 	[self addSubview:eventView];
 	
@@ -648,9 +656,9 @@ static NSString const * const HOURS_24[] = {
 		curEv = [subviews objectAtIndex:i];
 						
 		curEv.frame = CGRectMake((int) _lineX,
-								 (int) (spacePerMinute * [curEv.event minutesSinceMidnight] + _lineY[0]),
+								 (int) (spacePerMinute * [[curEv event] eventMinutesSinceMidnight] + _lineY[0]),
 								 (int) (self.bounds.size.width - _lineX),
-								 (int) (spacePerMinute * [curEv.event durationInMinutes]));
+								 (int) (spacePerMinute * [[curEv event] eventDurationInMinutes]));
 		
 		/*
 		 * Layout intersecting events to two columns.
@@ -681,7 +689,7 @@ static NSString const * const HOURS_24[] = {
 		if (!firstEvent || self.dayView.allDayGridView.hasAllDayEvents) {
 			autoScrollPoint = CGPointMake(0, 0);
 		} else {
-			int minutesSinceLastHour = ([firstEvent.event minutesSinceMidnight] % 60);
+			int minutesSinceLastHour = ([[firstEvent event] eventMinutesSinceMidnight] % 60);
 			CGFloat padding = minutesSinceLastHour * spacePerMinute + 7.5;
 			
 			autoScrollPoint = CGPointMake(0, firstEvent.frame.origin.y - padding);

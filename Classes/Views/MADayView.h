@@ -30,9 +30,14 @@
 @class MA_AllDayGridView;
 @class MADayHourView;
 @class MADayGridView;
-@class MAEvent;
 
-@protocol MADayViewDataSource, MADayViewDelegate;
+@protocol MAEventProtocol;
+@protocol MADayViewDataSource;
+@protocol MADayViewDelegate;
+
+#define MIN_EVENT_DURATION_IN_MINUTES 30
+#define DAY_IN_MINUTES 1440
+
 
 @interface MADayView : UIView {
 	UIImageView *_topBackground;
@@ -76,6 +81,6 @@
 @protocol MADayViewDelegate <NSObject>
 
 @optional
-- (void)dayView:(MADayView *)dayView eventTapped:(MAEvent *)event;
+- (void)dayView:(MADayView *)dayView eventTapped:(id <MAEventProtocol> )event;
 
 @end

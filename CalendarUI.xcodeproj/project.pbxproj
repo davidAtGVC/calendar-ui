@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		05E193B71778B64D0031A92D /* MAEventSortFunction.m in Sources */ = {isa = PBXBuildFile; fileRef = 05E193B61778B64D0031A92D /* MAEventSortFunction.m */; };
 		1D60589B0D05DD56006BFB54 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
 		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
@@ -30,6 +31,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		05E193B41778B64D0031A92D /* MAEventProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MAEventProtocol.h; sourceTree = "<group>"; };
+		05E193B51778B64D0031A92D /* MAEventSortFunction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MAEventSortFunction.h; sourceTree = "<group>"; };
+		05E193B61778B64D0031A92D /* MAEventSortFunction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MAEventSortFunction.m; sourceTree = "<group>"; };
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1D6058910D05DD3D006BFB54 /* CalendarUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CalendarUI.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1DF5F4DF0D08C38300B7A737 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
@@ -165,6 +169,9 @@
 		63C6A7D412462C0F007DCAAF /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				05E193B41778B64D0031A92D /* MAEventProtocol.h */,
+				05E193B51778B64D0031A92D /* MAEventSortFunction.h */,
+				05E193B61778B64D0031A92D /* MAEventSortFunction.m */,
 				63C6A7F212462C8C007DCAAF /* TapDetectingView.h */,
 				63C6A7F312462C8C007DCAAF /* TapDetectingView.m */,
 				63C6A7D512462C0F007DCAAF /* MAEvent.h */,
@@ -267,6 +274,7 @@
 				633345601247A6EF0086F398 /* MADayView.m in Sources */,
 				633345B21247AE580086F398 /* DayViewExampleController.m in Sources */,
 				6017229815EE2FB500C70B43 /* MAEventKitDataSource.m in Sources */,
+				05E193B71778B64D0031A92D /* MAEventSortFunction.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -26,11 +26,12 @@
  */
 
 #import "MAWeekView.h"
-
-#import "MAEvent.h"               /* MAEvent */
-#import <QuartzCore/QuartzCore.h> /* CALayer */
+#import "MAEventProtocol.h"
+#import "MAEventSortFunction.h"
 #import "MAGridView.h"            /* MAGridView */
 #import "TapDetectingView.h"      /* TapDetectingView */
+
+#import <QuartzCore/QuartzCore.h> /* CALayer */
 
 static const unsigned int HOURS_IN_DAY                        = 24;
 static const unsigned int DAYS_IN_WEEK                        = 7;
@@ -55,14 +56,7 @@ static const unsigned int TOP_BACKGROUND_HEIGHT               = 35;
 #define CURRENT_CALENDAR [NSCalendar currentCalendar]
 
 @interface MAEventView : TapDetectingView <TapDetectingViewDelegate> {
-	NSString *_title;
-	UIColor *_textColor;
-	UIFont *_textFont;
-	MAWeekView *_weekView;
-	MAEvent *_event;
 	CGRect _textRect;
-	size_t _xOffset;
-	size_t _yOffset;
 	CGPoint _touchStart;
 	BOOL _wasDragged;
 }
@@ -73,7 +67,7 @@ static const unsigned int TOP_BACKGROUND_HEIGHT               = 35;
 @property (nonatomic, strong) UIColor *textColor;
 @property (nonatomic, strong) UIFont *textFont;
 @property (nonatomic, strong) MAWeekView *weekView;
-@property (nonatomic, strong) MAEvent *event;
+@property (nonatomic, strong) id <MAEventProtocol> event;
 @property (nonatomic, assign) size_t xOffset;
 @property (nonatomic, assign) size_t yOffset;
 
@@ -123,13 +117,13 @@ static const unsigned int TOP_BACKGROUND_HEIGHT               = 35;
 @property (nonatomic, strong) UIFont *textFont;
 @property (nonatomic,copy) NSDate *week;
 
-- (void)addEventToOffset:(unsigned int)offset event:(MAEvent *)event;
+- (void)addEventToOffset:(unsigned int)offset event:(id <MAEventProtocol> )event;
 - (void)resetCachedData;
 
 @end
 
 @interface MAGridView (MAWeekViewAdditions)
-- (void)addEventToOffset:(unsigned int)offset event:(MAEvent *)event weekView:(MAWeekView *)weekView;
+- (void)addEventToOffset:(unsigned int)offset event:(id <MAEventProtocol> )event weekView:(MAWeekView *)weekView;
 @end
 
 @interface MAWeekView (PrivateMethods)
@@ -435,17 +429,21 @@ static const unsigned int TOP_BACKGROUND_HEIGHT               = 35;
 	for (NSDate *weekday in self.weekdayBarView.weekdays) {
 		NSArray *events = [self.dataSource weekView:self eventsForDate:weekday];
 		
-		for (id e in events) {
-			MAEvent *event = e;
-			event.displayDate = weekday;
-		}
+		// why is the view updating the model?
+//		for (id e in events) {
+//			id <MAEventProtocol> event = e;
+//			event.displayDate = weekday;
+//		}
 		
-		for (id e in [events sortedArrayUsingFunction:MAEvent_sortByStartTime context:NULL]) {
-			MAEvent *event = e;
+		for (id e in [events sortedArrayUsingFunction:MAEventProtocol_sortByStartTime context:NULL]) {
+			id <MAEventProtocol> event = e;
 			
-			if (event.allDay) {
+			if ([event isEventAllDay] == YES)
+			{
 				[self.allDayEventView addEventToOffset:d event:event];
-			} else {
+			}
+			else
+			{
 				[self.gridView addEventToOffset:d event:event weekView:self];
 			}
 		}
@@ -568,14 +566,14 @@ static NSString const * const HOURS_24[] = {
 
 @implementation MAGridView (MAWeekViewAdditions)
 
-- (void)addEventToOffset:(unsigned int)offset event:(MAEvent *)event weekView:(MAWeekView *)weekView {
+- (void)addEventToOffset:(unsigned int)offset event:(id <MAEventProtocol> )event weekView:(MAWeekView *)weekView {
 	MAEventView *eventView = [[MAEventView alloc] init];
 	eventView.weekView = weekView;
 	eventView.event = event;
-	eventView.backgroundColor = event.backgroundColor;
-	eventView.title = event.title;
+	eventView.backgroundColor = [event eventBackgroundColor];
+	eventView.title = [event eventTitle];
 	eventView.textFont = weekView.regularFont;
-	eventView.textColor = event.textColor;
+	eventView.textColor = [event eventTextColor];
 	eventView.xOffset = offset;
 	
 	[self addSubview:eventView];
@@ -591,9 +589,9 @@ static NSString const * const HOURS_24[] = {
 		}
 		MAEventView *eventView = (MAEventView *) view;
 		eventView.frame = CGRectMake(cellWidth * eventView.xOffset,
-									 cellHeight / MINUTES_IN_HOUR * [eventView.event minutesSinceMidnight],
+									 cellHeight / MINUTES_IN_HOUR * [[eventView event] eventMinutesSinceMidnight],
 									 cellWidth,
-									 cellHeight / MINUTES_IN_HOUR * [eventView.event durationInMinutes]);
+									 cellHeight / MINUTES_IN_HOUR * [[eventView event] eventDurationInMinutes]);
 		[eventView setNeedsDisplay];
 	}
 }
@@ -684,12 +682,10 @@ static NSString const * const HOURS_24[] = {
 
 @implementation MAAllDayEventView
 
-@synthesize weekView=_weekView;
-@synthesize textFont=_textFont;
-
 #define ARR_SET(X) _eventsInOffset[X] = 0;
 
-- (void)resetCachedData {
+- (void)resetCachedData
+{
 	_maxEvents = 0;
 	ARR_SET(0)
 	ARR_SET(1)
@@ -745,15 +741,15 @@ static NSString const * const HOURS_24[] = {
 	}
 }
 
-- (void)addEventToOffset:(unsigned int)offset event:(MAEvent *)event {	
+- (void)addEventToOffset:(unsigned int)offset event:(id <MAEventProtocol> )event {
 	MAEventView *eventView = [[MAEventView alloc] init];
 	
 	eventView.weekView = self.weekView;
 	eventView.event = event;
-	eventView.backgroundColor = event.backgroundColor;
-	eventView.title = event.title;
+	eventView.backgroundColor = [event eventBackgroundColor];
+	eventView.title = [event eventTitle];
 	eventView.textFont = self.textFont;
-	eventView.textColor = event.textColor;
+	eventView.textColor = [event eventTextColor];
 	eventView.xOffset = offset;
 	eventView.yOffset = _eventsInOffset[offset]++;
 	
@@ -905,7 +901,7 @@ static const CGFloat kCorner       = 5.0;
 		
 		/* Calculate the new time for the event */
 		
-		const int eventDurationInMinutes = [self.event durationInMinutes];
+		const int eventDurationInMinutes = [[self event] eventDurationInMinutes];
 		NSDate *weekday = [self.weekView.weekdayBarView.weekdays objectAtIndex:(int)round(posX)];
 		double hours;
 		double minutes;

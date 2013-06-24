@@ -38,8 +38,8 @@ NSInteger MAEvent_sortByStartTime(id ev1, id ev2, void *keyForSorting) {
 	MAEvent *event1 = (MAEvent *)ev1;
 	MAEvent *event2 = (MAEvent *)ev2;
 				   
-	int v1 = [event1 minutesSinceMidnight];
-	int v2 = [event2 minutesSinceMidnight];
+	int v1 = [event1 eventMinutesSinceMidnight];
+	int v2 = [event2 eventMinutesSinceMidnight];
 	
 	if (v1 < v2) {
 		return NSOrderedAscending;
@@ -48,8 +48,8 @@ NSInteger MAEvent_sortByStartTime(id ev1, id ev2, void *keyForSorting) {
 	} else {
 		/* Event start time is the same, compare by duration.
 		 */
-		int d1 = [event1 durationInMinutes];
-		int d2 = [event2 durationInMinutes];
+		int d1 = [event1 eventDurationInMinutes];
+		int d2 = [event2 eventDurationInMinutes];
 		
 		if (d1 < d2) {
 			/*
@@ -120,12 +120,69 @@ NSInteger MAEvent_sortByStartTime(id ev1, id ev2, void *keyForSorting) {
 			duration = MIN_EVENT_DURATION_IN_MINUTES;
 	} else {
 		// No need to check the minimum duration here because minutesSinceMidnight adjusts the start time.
-		duration = DAY_IN_MINUTES - [self minutesSinceMidnight];
+		duration = DAY_IN_MINUTES - [self eventMinutesSinceMidnight];
 	}
 	return duration;
 }
 
 #undef DATE_CMP
+
+
+#pragma mark - MAEventProtocol
+
+- (NSString *)eventTitle
+{
+	return [self title];
+}
+
+- (NSString *)eventNotes
+{
+	return [self title];
+}
+
+- (NSDate *)eventStart
+{
+	return [self start];
+}
+
+- (NSDate *)eventEnd
+{
+	return [self end];
+}
+
+- (NSDate *)eventDisplayDate
+{
+	return [self displayDate];
+}
+
+- (BOOL)isEventAllDay
+{
+	return [self allDay];
+}
+
+- (unsigned int)eventDurationInMinutes
+{
+	return [self eventDurationInMinutes];
+}
+
+- (unsigned int)eventMinutesSinceMidnight
+{
+	return [self minutesSinceMidnight];
+}
+
+- (UIColor *)eventBackgroundColor
+{
+	return [self eventBackgroundColor];
+}
+- (UIColor *)eventTextColor
+{
+	return [self eventTextColor];
+}
+
+- (NSDictionary *)eventUserInfo
+{
+	return [self userInfo];
+}
 
 
 @end

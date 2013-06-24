@@ -31,9 +31,10 @@
 @class MAHourView;
 @class MAWeekdayBarView;
 @class MAAllDayEventView;
-@class MAEvent;
 
-@protocol MAWeekViewDataSource, MAWeekViewDelegate;
+@protocol MAEventProtocol;
+@protocol MAWeekViewDataSource;
+@protocol MAWeekViewDelegate;
 
 @interface MAWeekView : UIView {
 	UIImageView *_topBackground;
@@ -77,9 +78,9 @@
 @protocol MAWeekViewDelegate <NSObject>
 
 @optional
-- (void)weekView:(MAWeekView *)weekView eventTapped:(MAEvent *)event;
+- (void)weekView:(MAWeekView *)weekView eventTapped:(id <MAEventProtocol> )event;
 - (void)weekView:(MAWeekView *)weekView weekDidChange:(NSDate *)week;
-- (void)weekView:(MAWeekView *)weekView eventDragged:(MAEvent *)event;
-- (BOOL)weekView:(MAWeekView *)weekView eventDraggingEnabled:(MAEvent *)event;
+- (void)weekView:(MAWeekView *)weekView eventDragged:(id <MAEventProtocol> )event;
+- (BOOL)weekView:(MAWeekView *)weekView eventDraggingEnabled:(id <MAEventProtocol> )event;
 
 @end

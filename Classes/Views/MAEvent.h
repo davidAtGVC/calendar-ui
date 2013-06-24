@@ -27,20 +27,11 @@
 
 #import <Foundation/Foundation.h>
 
+#import "MAEventProtocol.h"
+
 NSInteger MAEvent_sortByStartTime(id ev1, id ev2, void *keyForSorting);
 
-@interface MAEvent : NSObject {
-	NSString *_title;
-	NSDate *_start;
-	NSDate *_end;
-	NSDate *_displayDate;
-	BOOL _allDay;
-	
-	UIColor *backgroundColor;
-	UIColor *textColor;
-	
-	NSDictionary *userInfo;
-}
+@interface MAEvent : NSObject <MAEventProtocol>
 
 @property (nonatomic,copy) NSString *title;
 @property (nonatomic,copy) NSDate *start;
@@ -50,8 +41,5 @@ NSInteger MAEvent_sortByStartTime(id ev1, id ev2, void *keyForSorting);
 @property (nonatomic,strong) UIColor *backgroundColor;
 @property (nonatomic,strong) UIColor *textColor;
 @property (nonatomic,strong) NSDictionary *userInfo;
-
-- (unsigned int)durationInMinutes;
-- (unsigned int)minutesSinceMidnight;
 
 @end
