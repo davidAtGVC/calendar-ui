@@ -37,12 +37,12 @@
 	UIColor *_lineColor;
 }
 
-@property (readwrite,assign) unsigned int rows;
-@property (readwrite,assign) unsigned int columns;
-@property (readwrite,assign) BOOL horizontalLines;
-@property (readwrite,assign) BOOL verticalLines;
-@property (readwrite,assign) BOOL outerBorder;
-@property (readwrite,assign) CGFloat lineWidth;
+@property (nonatomic, readwrite,assign) unsigned int rows;
+@property (nonatomic, readwrite,assign) unsigned int columns;
+@property (nonatomic, readwrite,assign) BOOL horizontalLines;
+@property (nonatomic, readwrite,assign) BOOL verticalLines;
+@property (nonatomic, readwrite,assign) BOOL outerBorder;
+@property (nonatomic, readwrite,assign) CGFloat lineWidth;
 @property (nonatomic, strong) UIColor *lineColor;
 @property (readonly) CGFloat cellWidth;
 @property (readonly) CGFloat cellHeight;

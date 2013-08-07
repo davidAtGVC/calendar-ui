@@ -131,10 +131,6 @@ static const unsigned int TOP_BACKGROUND_HEIGHT          = 35;
 
 @implementation MADayView
 
-@synthesize autoScrollToFirstEvent=_autoScrollToFirstEvent;
-@synthesize labelFontSize=_labelFontSize;
-@synthesize delegate=_delegate;
-
 - (id)initWithFrame:(CGRect)frame {
     if (self = [super initWithFrame:frame]) {
 		[self setupCustomInitialisation];

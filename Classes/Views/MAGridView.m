@@ -33,12 +33,6 @@
 
 @implementation MAGridView
 
-@synthesize horizontalLines=_horizontalLines;
-@synthesize verticalLines=_verticalLines;
-@synthesize lineWidth=_lineWidth;
-@synthesize lineColor=_lineColor;
-@synthesize outerBorder=_outerBorder;
-
 - (id)initWithFrame:(CGRect)frame {
     if (self = [super initWithFrame:frame]) {
 		[self setupCustomInitialisation];

@@ -35,7 +35,7 @@
 @protocol MADayViewDataSource;
 @protocol MADayViewDelegate;
 
-#define MIN_EVENT_DURATION_IN_MINUTES 30
+#define MIN_EVENT_DURATION_IN_MINUTES 10
 #define DAY_IN_MINUTES 1440
 
 
@@ -63,7 +63,7 @@
 }
 
 @property (nonatomic,assign) BOOL autoScrollToFirstEvent;
-@property (readwrite,assign) unsigned int labelFontSize;
+@property (nonatomic,assign) unsigned int labelFontSize;
 @property (nonatomic,copy) NSDate *day;
 @property (nonatomic,unsafe_unretained) IBOutlet id<MADayViewDataSource> dataSource;
 @property (nonatomic,unsafe_unretained) IBOutlet id<MADayViewDelegate> delegate;
