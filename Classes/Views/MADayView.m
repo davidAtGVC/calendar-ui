@@ -184,7 +184,11 @@ static const unsigned int TOP_BACKGROUND_HEIGHT          = 35;
 	self.gridView.frame = CGRectMake(CGRectGetMinX(self.allDayGridView.bounds),
 									 CGRectGetMaxY(self.allDayGridView.bounds),
 									 CGRectGetWidth(self.bounds),
+#ifdef __IPHONE_7_0
+									 [@"FOO" sizeWithAttributes:@{NSFontAttributeName:self.boldFont}].height * SPACE_BETWEEN_HOUR_LABELS * HOURS_IN_DAY);
+#else
 									 [@"FOO" sizeWithFont:self.boldFont].height * SPACE_BETWEEN_HOUR_LABELS * HOURS_IN_DAY);
+#endif
 	
 	self.scrollView.frame = CGRectMake(CGRectGetMinX(self.bounds),
 									   CGRectGetMaxY(self.topBackground.bounds),
@@ -250,7 +254,11 @@ static const unsigned int TOP_BACKGROUND_HEIGHT          = 35;
 		_allDayGridView.backgroundColor = [UIColor whiteColor];
 		_allDayGridView.dayView = self;
 		_allDayGridView.textFont = self.boldFont;
+#ifdef __IPHONE_7_0
+		_allDayGridView.eventHeight = [@"FOO" sizeWithAttributes:@{NSFontAttributeName:self.regularFont}].height * 2.f;
+#else
 		_allDayGridView.eventHeight = [@"FOO" sizeWithFont:self.regularFont].height * 2.f;
+#endif
 	}
 	return _allDayGridView;
 }
@@ -454,7 +462,11 @@ static const CGFloat kCorner       = 5.0;
 						   (int) (CGRectGetWidth(self.bounds) - 2*kCorner),
 						   (int) (CGRectGetHeight(self.bounds) - 2*kCorner));
 	
+#ifdef __IPHONE_7_0
+	CGSize sizeNeeded = [self.title sizeWithAttributes:@{NSFontAttributeName:self.textFont}];
+#else
 	CGSize sizeNeeded = [self.title sizeWithFont:self.textFont];
+#endif
 	
 	if (_textRect.size.height > sizeNeeded.height) {
 		_textRect.origin.y = (int) ((_textRect.size.height - sizeNeeded.height) / 2 + kCorner);
@@ -464,10 +476,18 @@ static const CGFloat kCorner       = 5.0;
 - (void)drawRect:(CGRect)rect {
 	[self.textColor set];
 	
+#ifdef __IPHONE_7_0
+	NSMutableParagraphStyle *style = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
+	[style setAlignment:NSTextAlignmentLeft];
+	[style setLineBreakMode:NSLineBreakByTruncatingTail];
+	
+	[self.title drawInRect:_textRect withAttributes:@{NSFontAttributeName: self.textFont, NSParagraphStyleAttributeName:style}];
+#else
 	[self.title drawInRect:_textRect
 				  withFont:self.textFont
 			 lineBreakMode:NSLineBreakByTruncatingTail
 				 alignment:NSTextAlignmentLeft];
+#endif
 }
 
 - (void)tapDetectingView:(TapDetectingView *)view gotSingleTapAtPoint:(CGPoint)tapPoint {
@@ -611,7 +631,11 @@ static NSString const * const HOURS_24[] = {
 	register unsigned int i;
 	
 	for (i=0; i < HOURS_IN_DAY; i++) {
+#ifdef __IPHONE_7_0
+		hourSize[i] = [HOURS[i] sizeWithAttributes:@{NSFontAttributeName:self.textFont}];
+#else
 		hourSize[i] = [HOURS[i] sizeWithFont:self.textFont];
+#endif
 		totalTextHeight += hourSize[i].height;
 		
 		if (hourSize[i].width > maxTextWidth) {
@@ -709,13 +733,24 @@ static NSString const * const HOURS_24[] = {
 	CGContextSetStrokeColorWithColor(c, [[UIColor lightGrayColor] CGColor]);
 	CGContextSetLineWidth(c, 0.5);
 	CGContextBeginPath(c);
-	
-	for (i=0; i < HOURS_IN_DAY; i++) {
+
+#ifdef __IPHONE_7_0
+	NSMutableParagraphStyle *style = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
+	[style setAlignment:NSTextAlignmentRight];
+	[style setLineBreakMode:NSLineBreakByTruncatingTail];
+#endif
+
+	for (i=0; i < HOURS_IN_DAY; i++)
+	{
+#ifdef __IPHONE_7_0
+		[HOURS[i] drawInRect:_textRect[i] withAttributes:@{NSFontAttributeName: self.textFont, NSParagraphStyleAttributeName:style}];
+#else
 		[HOURS[i] drawInRect: _textRect[i]
 					withFont:self.textFont
 			   lineBreakMode:NSLineBreakByTruncatingTail
 				   alignment:NSTextAlignmentRight];
 		
+#endif
 		CGContextMoveToPoint(c, _lineX, _lineY[i]);
 		CGContextAddLineToPoint(c, self.bounds.size.width, _lineY[i]);
 	}
