@@ -35,7 +35,7 @@
 @protocol MADayViewDataSource;
 @protocol MADayViewDelegate;
 
-#define MIN_EVENT_DURATION_IN_MINUTES 10
+#define MIN_EVENT_DURATION_IN_MINUTES 30
 #define DAY_IN_MINUTES 1440
 
 
